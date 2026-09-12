@@ -6,11 +6,7 @@ import 'package:uuid/uuid.dart';
 
 /// The outcome of asking the cabinet for a dose.
 class DispenseOutcome {
-  const DispenseOutcome({
-    required this.alerts,
-    this.dispense,
-    this.stock,
-  });
+  const DispenseOutcome({required this.alerts, this.dispense, this.stock});
 
   /// Everything the safety checks found. Empty means a clean release.
   final List<SafetyAlert> alerts;
@@ -36,7 +32,7 @@ class DispenseOutcome {
 /// after a few seconds whether or not the nurse remembered to.
 class CabinetService extends ChangeNotifier {
   CabinetService({required this.repository, Uuid? uuid})
-      : _uuid = uuid ?? const Uuid();
+    : _uuid = uuid ?? const Uuid();
 
   final HospitalRepository repository;
   final Uuid _uuid;
@@ -158,17 +154,22 @@ class CabinetService extends ChangeNotifier {
     // sitting in the drawer.
     final updatedStock = stock == null
         ? null
-        : await repository.saveStockItem(stock.copyWith(
-            quantityOnHand:
-                (stock.quantityOnHand - request.quantity).round().clamp(0, 1 << 30),
-          ));
+        : await repository.saveStockItem(
+            stock.copyWith(
+              quantityOnHand: (stock.quantityOnHand - request.quantity)
+                  .round()
+                  .clamp(0, 1 << 30),
+            ),
+          );
 
-    final completed = await repository.saveDispense(request.copyWith(
-      status: DispenseStatus.dispensed,
-      dispensedAt: now,
-      dispensedBy: witness == null ? dispensedBy : '$dispensedBy / $witness',
-      lotNumber: stock?.lotNumber,
-    ));
+    final completed = await repository.saveDispense(
+      request.copyWith(
+        status: DispenseStatus.dispensed,
+        dispensedAt: now,
+        dispensedBy: witness == null ? dispensedBy : '$dispensedBy / $witness',
+        lotNumber: stock?.lotNumber,
+      ),
+    );
 
     closeDrawer();
     return DispenseOutcome(
@@ -184,32 +185,34 @@ class CabinetService extends ChangeNotifier {
     required String reason,
     required String refusedBy,
     DateTime? at,
-  }) =>
-      repository.saveDispense(request.copyWith(
-        status: DispenseStatus.refused,
-        dispensedAt: at ?? DateTime.now(),
-        dispensedBy: refusedBy,
-        refusalReason: reason,
-      ));
+  }) => repository.saveDispense(
+    request.copyWith(
+      status: DispenseStatus.refused,
+      dispensedAt: at ?? DateTime.now(),
+      dispensedBy: refusedBy,
+      refusalReason: reason,
+    ),
+  );
 
   /// Adds units to a slot and gives it a fresh lot number and expiry.
   Future<StockItem> restock(
     StockItem item,
     int quantity, {
     DateTime? expiry,
-  }) =>
-      repository.saveStockItem(StockItem(
-        id: item.id,
-        cabinetId: item.cabinetId,
-        slot: item.slot,
-        medication: item.medication,
-        quantityOnHand: item.quantityOnHand + quantity,
-        parLevel: item.parLevel,
-        // A restock replaces the lot: mixing an expired lot with a fresh one in
-        // the same drawer is exactly what a cabinet is meant to prevent.
-        expiryDate: expiry ?? DateTime.now().add(const Duration(days: 540)),
-        lotNumber: 'LOT${_uuid.v4().substring(0, 6).toUpperCase()}',
-      ));
+  }) => repository.saveStockItem(
+    StockItem(
+      id: item.id,
+      cabinetId: item.cabinetId,
+      slot: item.slot,
+      medication: item.medication,
+      quantityOnHand: item.quantityOnHand + quantity,
+      parLevel: item.parLevel,
+      // A restock replaces the lot: mixing an expired lot with a fresh one in
+      // the same drawer is exactly what a cabinet is meant to prevent.
+      expiryDate: expiry ?? DateTime.now().add(const Duration(days: 540)),
+      lotNumber: 'LOT${_uuid.v4().substring(0, 6).toUpperCase()}',
+    ),
+  );
 
   Future<StockItem?> _findSlot(String cabinetId, String medicationCode) async {
     final items = await repository.listStock(cabinetId: cabinetId);

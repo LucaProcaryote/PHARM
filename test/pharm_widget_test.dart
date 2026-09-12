@@ -17,21 +17,23 @@ Future<void> pumpPharm(WidgetTester tester) async {
     seedUsers.firstWhere((u) => u.role == UserRole.pharmacist),
   );
 
-  await tester.pumpWidget(MiniHospitalApp(
-    config: const AppConfig(
-      app: HospitalApp.pharm,
-      backendMode: BackendMode.memory,
-      authMode: AuthMode.demo,
-      apiBaseUrl: '',
-      fhirBaseUrl: '',
-      eaiBaseUrl: '',
+  await tester.pumpWidget(
+    MiniHospitalApp(
+      config: const AppConfig(
+        app: HospitalApp.pharm,
+        backendMode: BackendMode.memory,
+        authMode: AuthMode.demo,
+        apiBaseUrl: '',
+        fhirBaseUrl: '',
+        eaiBaseUrl: '',
+      ),
+      title: (l10n) => l10n.appTitlePharm,
+      homeBuilder: (context) => const PharmHome(),
+      repositoryOverride: repository,
+      authOverride: auth,
+      localeStore: InMemoryLocaleStore(),
     ),
-    title: (l10n) => l10n.appTitlePharm,
-    homeBuilder: (context) => const PharmHome(),
-    repositoryOverride: repository,
-    authOverride: auth,
-    localeStore: InMemoryLocaleStore(),
-  ));
+  );
   await tester.pumpAndSettle();
 }
 
@@ -50,10 +52,12 @@ void main() {
 
     // Navigate via the rail: "Cabinet" is also the label of a dropdown on the
     // queue screen, so an unqualified finder would open that instead.
-    await tester.tap(find.descendant(
-      of: find.byType(NavigationRail),
-      matching: find.text('Cabinet'),
-    ));
+    await tester.tap(
+      find.descendant(
+        of: find.byType(NavigationRail),
+        matching: find.text('Cabinet'),
+      ),
+    );
     await tester.pumpAndSettle();
 
     // Locked cabinets offer "Unlock cabinet"; the state is written, not implied.
@@ -67,22 +71,28 @@ void main() {
   testWidgets('stock alerts are named, not only coloured', (tester) async {
     await pumpPharm(tester);
 
-    await tester.tap(find.descendant(
-      of: find.byType(NavigationRail),
-      matching: find.text('Stock'),
-    ));
+    await tester.tap(
+      find.descendant(
+        of: find.byType(NavigationRail),
+        matching: find.text('Stock'),
+      ),
+    );
     await tester.pumpAndSettle();
 
     // The seed deliberately contains empty, expired and below-par slots.
     expect(find.textContaining('Cabinet alerts'), findsOneWidget);
     final labels = <String>['Out of stock', 'Expired lot', 'Low stock'];
     final found = labels.where((l) => find.text(l).evaluate().isNotEmpty);
-    expect(found, isNotEmpty,
-        reason: 'the stock screen should surface at least one kind of alert');
+    expect(
+      found,
+      isNotEmpty,
+      reason: 'the stock screen should surface at least one kind of alert',
+    );
   });
 
-  testWidgets('the dispensing dialog runs the checks before opening anything',
-      (tester) async {
+  testWidgets('the dispensing dialog runs the checks before opening anything', (
+    tester,
+  ) async {
     await pumpPharm(tester);
 
     await tester.tap(find.text('Dispense').first);

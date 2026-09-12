@@ -18,14 +18,22 @@ void main() {
   tearDown(() => service.dispose());
 
   /// A pending dose together with everything needed to hand it over.
-  Future<({Dispense request, Prescription prescription, Patient patient, Cabinet cabinet})>
-      pendingDose() async {
+  Future<
+    ({
+      Dispense request,
+      Prescription prescription,
+      Patient patient,
+      Cabinet cabinet,
+    })
+  >
+  pendingDose() async {
     final pending = await repository.listDispenses(
       status: DispenseStatus.requested,
     );
     for (final dispense in pending) {
-      final prescription =
-          await repository.findPrescription(dispense.prescriptionId);
+      final prescription = await repository.findPrescription(
+        dispense.prescriptionId,
+      );
       final patient = await repository.findPatient(dispense.patientId);
       final cabinet = dispense.cabinetId == null
           ? null
@@ -49,8 +57,9 @@ void main() {
 
   group('the cabinet lock', () {
     test('a locked cabinet refuses to open a drawer', () async {
-      final cabinet = (await repository.listCabinets())
-          .firstWhere((c) => c.isLocked);
+      final cabinet = (await repository.listCabinets()).firstWhere(
+        (c) => c.isLocked,
+      );
       final slot = (await repository.listStock(cabinetId: cabinet.id)).first;
 
       expect(service.openDrawer(cabinet, slot), isFalse);
@@ -58,8 +67,9 @@ void main() {
     });
 
     test('unlocking lets a drawer open, and only one at a time', () async {
-      var cabinet = (await repository.listCabinets())
-          .firstWhere((c) => c.isLocked);
+      var cabinet = (await repository.listCabinets()).firstWhere(
+        (c) => c.isLocked,
+      );
       cabinet = await service.unlock(cabinet);
       expect(cabinet.isLocked, isFalse);
 
@@ -127,8 +137,7 @@ void main() {
 
     test('a high-risk allergy blocks the dispense outright', () async {
       // Émile Van Damme is allergic to penicillin; give him amoxicillin.
-      final patient =
-          (await repository.findPatient('pat-001'))!;
+      final patient = (await repository.findPatient('pat-001'))!;
       final amoxicillin = formularyByCode('MED-0103')!;
       final cabinet = await service.unlock(
         (await repository.findCabinet('cab-card'))!,
@@ -155,8 +164,9 @@ void main() {
         quantity: 1,
       );
 
-      final allergy =
-          alerts.where((a) => a.blocker == DispenseBlocker.allergyConflict);
+      final allergy = alerts.where(
+        (a) => a.blocker == DispenseBlocker.allergyConflict,
+      );
       expect(allergy, isNotEmpty);
       expect(allergy.first.isBlocking, isTrue);
       // The reason is written in all three languages, ready for the interface.
@@ -186,8 +196,9 @@ void main() {
     });
 
     test('an expired lot blocks the dispense', () async {
-      final expired = (await repository.listStock())
-          .firstWhere((s) => s.isExpired);
+      final expired = (await repository.listStock()).firstWhere(
+        (s) => s.isExpired,
+      );
       final cabinet = await service.unlock(
         (await repository.findCabinet(expired.cabinetId))!,
       );
@@ -219,8 +230,9 @@ void main() {
     });
 
     test('asking for more than the slot holds blocks the dispense', () async {
-      final slot = (await repository.listStock())
-          .firstWhere((s) => s.quantityOnHand > 0 && !s.isExpired);
+      final slot = (await repository.listStock()).firstWhere(
+        (s) => s.quantityOnHand > 0 && !s.isExpired,
+      );
       final cabinet = await service.unlock(
         (await repository.findCabinet(slot.cabinetId))!,
       );
@@ -256,8 +268,10 @@ void main() {
     test('deducts the stock and records the handover', () async {
       final dose = await pendingDose();
       final cabinet = await service.unlock(dose.cabinet);
-      final before =
-          await slotFor(cabinet.id, dose.prescription.medication.code);
+      final before = await slotFor(
+        cabinet.id,
+        dose.prescription.medication.code,
+      );
 
       final outcome = await service.dispense(
         patient: dose.patient,
@@ -275,8 +289,10 @@ void main() {
       expect(outcome.dispense!.dispensedAt, now);
       expect(outcome.dispense!.lotNumber, before.lotNumber);
 
-      final after =
-          await slotFor(cabinet.id, dose.prescription.medication.code);
+      final after = await slotFor(
+        cabinet.id,
+        dose.prescription.medication.code,
+      );
       expect(
         after.quantityOnHand,
         before.quantityOnHand - dose.request.quantity.round(),
@@ -288,8 +304,10 @@ void main() {
 
     test('refuses while the cabinet is locked, and changes nothing', () async {
       final dose = await pendingDose();
-      final before =
-          await slotFor(dose.cabinet.id, dose.prescription.medication.code);
+      final before = await slotFor(
+        dose.cabinet.id,
+        dose.prescription.medication.code,
+      );
 
       final outcome = await service.dispense(
         patient: dose.patient,
@@ -301,8 +319,10 @@ void main() {
 
       expect(outcome.succeeded, isFalse);
       expect(outcome.isBlocked, isTrue);
-      final after =
-          await slotFor(dose.cabinet.id, dose.prescription.medication.code);
+      final after = await slotFor(
+        dose.cabinet.id,
+        dose.prescription.medication.code,
+      );
       expect(after.quantityOnHand, before.quantityOnHand);
     });
 
@@ -343,8 +363,7 @@ void main() {
         dispensedBy: 'Paul Mertens',
         acknowledgedWarnings: true,
       );
-      expect(outcome.succeeded, isFalse,
-          reason: 'no witness was given');
+      expect(outcome.succeeded, isFalse, reason: 'no witness was given');
 
       outcome = await service.dispense(
         patient: patient,
@@ -432,8 +451,7 @@ void main() {
 
   group('restocking', () {
     test('adds units and replaces the lot', () async {
-      final empty = (await repository.listStock())
-          .firstWhere((s) => s.isEmpty);
+      final empty = (await repository.listStock()).firstWhere((s) => s.isEmpty);
       final restocked = await service.restock(empty, 40);
 
       expect(restocked.quantityOnHand, 40);
@@ -443,8 +461,9 @@ void main() {
     });
 
     test('clears an expired slot', () async {
-      final expired = (await repository.listStock())
-          .firstWhere((s) => s.isExpired);
+      final expired = (await repository.listStock()).firstWhere(
+        (s) => s.isExpired,
+      );
       final restocked = await service.restock(expired, 25);
       expect(restocked.isExpired, isFalse);
     });

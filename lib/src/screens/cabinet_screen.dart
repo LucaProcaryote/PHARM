@@ -74,8 +74,7 @@ class _CabinetScreenState extends State<CabinetScreen> {
                   Expanded(
                     child: DropdownButtonFormField<String>(
                       initialValue: cabinet.id,
-                      decoration:
-                          InputDecoration(labelText: l10n.pharmCabinet),
+                      decoration: InputDecoration(labelText: l10n.pharmCabinet),
                       items: <DropdownMenuItem<String>>[
                         for (final option in data.cabinets)
                           DropdownMenuItem<String>(
@@ -103,7 +102,8 @@ class _CabinetScreenState extends State<CabinetScreen> {
                 child: Align(
                   alignment: Alignment.centerLeft,
                   child: StatusChip(
-                    label: '${cabinet.temperatureCelsius!.toStringAsFixed(1)} °C',
+                    label:
+                        '${cabinet.temperatureCelsius!.toStringAsFixed(1)} °C',
                     color: HospitalTheme.infoOf(context),
                     icon: Icons.thermostat,
                     dense: true,
@@ -192,12 +192,12 @@ class _DrawerTile extends StatelessWidget {
     final (Color color, String? flag) = item.isExpired
         ? (HospitalTheme.criticalOf(context), l10n.pharmExpiredLot)
         : item.isEmpty
-            ? (HospitalTheme.criticalOf(context), l10n.pharmOutOfStock)
-            : item.isLow
-                ? (HospitalTheme.warningOf(context), l10n.pharmLowStock)
-                : item.isNearExpiry
-                    ? (HospitalTheme.warningOf(context), l10n.pharmNearExpiry)
-                    : (HospitalTheme.successOf(context), null);
+        ? (HospitalTheme.criticalOf(context), l10n.pharmOutOfStock)
+        : item.isLow
+        ? (HospitalTheme.warningOf(context), l10n.pharmLowStock)
+        : item.isNearExpiry
+        ? (HospitalTheme.warningOf(context), l10n.pharmNearExpiry)
+        : (HospitalTheme.successOf(context), null);
 
     return SizedBox(
       width: 230,
@@ -209,7 +209,9 @@ class _DrawerTile extends StatelessWidget {
               : color.withValues(alpha: 0.07),
           borderRadius: BorderRadius.circular(10),
           border: Border.all(
-            color: isOpen ? theme.colorScheme.primary : color.withValues(alpha: 0.4),
+            color: isOpen
+                ? theme.colorScheme.primary
+                : color.withValues(alpha: 0.4),
             width: isOpen ? 2 : 1,
           ),
         ),
@@ -220,7 +222,10 @@ class _DrawerTile extends StatelessWidget {
             Row(
               children: <Widget>[
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 2,
+                  ),
                   decoration: BoxDecoration(
                     color: theme.colorScheme.surfaceContainerHighest,
                     borderRadius: BorderRadius.circular(4),
@@ -248,8 +253,9 @@ class _DrawerTile extends StatelessWidget {
             Gap.h4,
             Text(
               item.medication.name.forLanguage(language),
-              style: theme.textTheme.bodySmall
-                  ?.copyWith(fontWeight: FontWeight.w700),
+              style: theme.textTheme.bodySmall?.copyWith(
+                fontWeight: FontWeight.w700,
+              ),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),
@@ -331,8 +337,9 @@ class _DrawerTile extends StatelessWidget {
                   tooltip: l10n.pharmRestock,
                   visualDensity: VisualDensity.compact,
                   icon: const Icon(Icons.add_box_outlined, size: 18),
-                  onPressed:
-                      canOperate ? () => showRestockDialog(context, item) : null,
+                  onPressed: canOperate
+                      ? () => showRestockDialog(context, item)
+                      : null,
                 ),
               ],
             ),

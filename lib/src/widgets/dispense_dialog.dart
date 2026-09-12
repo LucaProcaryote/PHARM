@@ -146,12 +146,16 @@ class _DispenseDialogState extends State<_DispenseDialog> {
     }
 
     navigator.pop();
-    messenger.showSnackBar(SnackBar(
-      content: Text(l10n.pharmDispenseSuccess(
-        widget.prescription.medication.name.forLanguage(language),
-        widget.patient.fullName,
-      )),
-    ));
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text(
+          l10n.pharmDispenseSuccess(
+            widget.prescription.medication.name.forLanguage(language),
+            widget.patient.fullName,
+          ),
+        ),
+      ),
+    );
   }
 
   @override
@@ -182,8 +186,9 @@ class _DispenseDialogState extends State<_DispenseDialog> {
                       Text(
                         '${medication.name.forLanguage(language)} '
                         '${medication.strength}',
-                        style: theme.textTheme.titleSmall
-                            ?.copyWith(fontWeight: FontWeight.w700),
+                        style: theme.textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.w700,
+                        ),
                       ),
                       Text(widget.prescription.dosageText(language)),
                       Gap.h8,
@@ -202,7 +207,8 @@ class _DispenseDialogState extends State<_DispenseDialog> {
                           ),
                           LabeledValue(
                             label: l10n.labelQuantity,
-                            value: '${widget.request.quantity.toStringAsFixed(0)} '
+                            value:
+                                '${widget.request.quantity.toStringAsFixed(0)} '
                                 '${widget.prescription.doseUnit}',
                           ),
                           LabeledValue(
@@ -243,7 +249,8 @@ class _DispenseDialogState extends State<_DispenseDialog> {
                 for (final alert in alerts)
                   _AlertBox(alert: alert, language: language),
 
-              if (alerts != null && alerts.any((a) => a.isBlocking)) ...<Widget>[
+              if (alerts != null &&
+                  alerts.any((a) => a.isBlocking)) ...<Widget>[
                 Gap.h8,
                 Text(
                   l10n.safetyBlocked,

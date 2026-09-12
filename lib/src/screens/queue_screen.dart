@@ -38,8 +38,9 @@ class _QueueScreenState extends State<QueueScreen> {
         final patients = <String, Patient>{};
         for (final dispense in dispenses) {
           if (!prescriptions.containsKey(dispense.prescriptionId)) {
-            final prescription =
-                await repository.findPrescription(dispense.prescriptionId);
+            final prescription = await repository.findPrescription(
+              dispense.prescriptionId,
+            );
             if (prescription != null) {
               prescriptions[prescription.id] = prescription;
             }
@@ -70,8 +71,7 @@ class _QueueScreenState extends State<QueueScreen> {
                   Expanded(
                     child: DropdownButtonFormField<String?>(
                       initialValue: _cabinetFilter,
-                      decoration:
-                          InputDecoration(labelText: l10n.pharmCabinet),
+                      decoration: InputDecoration(labelText: l10n.pharmCabinet),
                       items: <DropdownMenuItem<String?>>[
                         DropdownMenuItem<String?>(
                           value: null,
@@ -94,8 +94,7 @@ class _QueueScreenState extends State<QueueScreen> {
                   FilterChip(
                     selected: _showHistory,
                     label: Text(l10n.pharmHistory),
-                    onSelected: (value) =>
-                        setState(() => _showHistory = value),
+                    onSelected: (value) => setState(() => _showHistory = value),
                   ),
                 ],
               ),
@@ -171,16 +170,18 @@ class _QueueCard extends StatelessWidget {
         .firstOrNull;
 
     final isPending = dispense.status == DispenseStatus.requested;
-    final isOverdue = isPending &&
+    final isOverdue =
+        isPending &&
         DateTime.now().difference(dispense.requestedAt) >
             const Duration(hours: 1);
 
     final statusColor = switch (dispense.status) {
       DispenseStatus.dispensed => HospitalTheme.successOf(context),
       DispenseStatus.refused => HospitalTheme.criticalOf(context),
-      DispenseStatus.requested => isOverdue
-          ? HospitalTheme.criticalOf(context)
-          : HospitalTheme.infoOf(context),
+      DispenseStatus.requested =>
+        isOverdue
+            ? HospitalTheme.criticalOf(context)
+            : HospitalTheme.infoOf(context),
       _ => theme.colorScheme.outline,
     };
 
@@ -202,8 +203,9 @@ class _QueueCard extends StatelessWidget {
                       Text(
                         '${prescription.medication.name.forLanguage(language)} '
                         '${prescription.medication.strength}',
-                        style: theme.textTheme.titleSmall
-                            ?.copyWith(fontWeight: FontWeight.w700),
+                        style: theme.textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.w700,
+                        ),
                       ),
                       Text(
                         prescription.dosageText(language),
@@ -253,8 +255,8 @@ class _QueueCard extends StatelessWidget {
                 dispense.status == DispenseStatus.refused
                     ? '${l10n.pharmRefusalReason}: ${dispense.refusalReason ?? '—'}'
                     : '${l10n.pharmDispensed} · '
-                        '${dispense.dispensedBy ?? '—'} · '
-                        '${dispense.dispensedAt == null ? '' : Formats.dateTime(context, dispense.dispensedAt!)}',
+                          '${dispense.dispensedBy ?? '—'} · '
+                          '${dispense.dispensedAt == null ? '' : Formats.dateTime(context, dispense.dispensedAt!)}',
                 style: theme.textTheme.labelSmall?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
                 ),
@@ -275,12 +277,12 @@ class _QueueCard extends StatelessWidget {
                     onPressed: cabinet == null
                         ? null
                         : () => showDispenseDialog(
-                              context: context,
-                              patient: patient,
-                              prescription: prescription,
-                              cabinet: cabinet,
-                              request: dispense,
-                            ),
+                            context: context,
+                            patient: patient,
+                            prescription: prescription,
+                            cabinet: cabinet,
+                            request: dispense,
+                          ),
                     icon: const Icon(Icons.medication_outlined, size: 16),
                     label: Text(l10n.pharmDispense),
                   ),

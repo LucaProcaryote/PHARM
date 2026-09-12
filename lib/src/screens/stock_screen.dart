@@ -32,7 +32,9 @@ class _StockScreenState extends State<StockScreen> {
     final language = Localizations.localeOf(context).languageCode;
     final theme = Theme.of(context);
 
-    return RepositoryBuilder<({List<StockItem> stock, Map<String, Cabinet> cabinets})>(
+    return RepositoryBuilder<
+      ({List<StockItem> stock, Map<String, Cabinet> cabinets})
+    >(
       query: (repository) async => (
         stock: await repository.listStock(query: _query),
         cabinets: <String, Cabinet>{
@@ -99,13 +101,25 @@ class _StockScreenState extends State<StockScreen> {
                         final cabinet = data.cabinets[item.cabinetId];
                         final flags = <(String, Color)>[
                           if (item.isEmpty)
-                            (l10n.pharmOutOfStock, HospitalTheme.criticalOf(context)),
+                            (
+                              l10n.pharmOutOfStock,
+                              HospitalTheme.criticalOf(context),
+                            ),
                           if (item.isExpired)
-                            (l10n.pharmExpiredLot, HospitalTheme.criticalOf(context)),
+                            (
+                              l10n.pharmExpiredLot,
+                              HospitalTheme.criticalOf(context),
+                            ),
                           if (item.isLow && !item.isEmpty)
-                            (l10n.pharmLowStock, HospitalTheme.warningOf(context)),
+                            (
+                              l10n.pharmLowStock,
+                              HospitalTheme.warningOf(context),
+                            ),
                           if (item.isNearExpiry)
-                            (l10n.pharmNearExpiry, HospitalTheme.warningOf(context)),
+                            (
+                              l10n.pharmNearExpiry,
+                              HospitalTheme.warningOf(context),
+                            ),
                         ];
 
                         return ListTile(
@@ -128,11 +142,19 @@ class _StockScreenState extends State<StockScreen> {
                             crossAxisAlignment: WrapCrossAlignment.center,
                             children: <Widget>[
                               for (final (label, color) in flags)
-                                StatusChip(label: label, color: color, dense: true),
+                                StatusChip(
+                                  label: label,
+                                  color: color,
+                                  dense: true,
+                                ),
                               IconButton(
                                 tooltip: l10n.pharmRestock,
-                                icon: const Icon(Icons.add_box_outlined, size: 18),
-                                onPressed: () => showRestockDialog(context, item),
+                                icon: const Icon(
+                                  Icons.add_box_outlined,
+                                  size: 18,
+                                ),
+                                onPressed: () =>
+                                    showRestockDialog(context, item),
                               ),
                             ],
                           ),

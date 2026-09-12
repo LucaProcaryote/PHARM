@@ -1,11 +1,11 @@
 {
-    "name": "pharm_app",
-    "short_name": "pharm_app",
+    "name": "Mini-Hospital Pharmacy",
+    "short_name": "Pharmacy",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "Mini-Hospital 2026 - Pharmacy Cabinet",
+    "background_color": "#004F52",
+    "theme_color": "#00696D",
+    "description": "Mini-Hospital 2026 - The pharmacy cabinet - stock, dispensing and controls",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
